@@ -72,6 +72,66 @@ class BST {
         }
         return node;
     }
+
+    void removeIterative(const int& value) {
+        BSTNode* current = root;
+        if (!current) {
+            return;
+        }
+        if (!current->left && !current->right) {
+            if (current->value == value) {
+                delete current;
+                root = nullptr;
+            }
+            return;
+        }
+
+        BSTNode* parent = nullptr;
+        bool remove_from_left = true;
+
+        while (current && current->value != value) {
+            parent = current;
+            if (value < current->value) {
+                current = current->left;
+                remove_from_left = true;
+            } else {
+                current = current->right;
+                remove_from_left = false;
+            }
+        }
+        if (!current) return;
+
+        BSTNode* node_to_remove = current;
+        BSTNode* replacementNode = nullptr;
+
+        if (current->left && current->right) {
+            BSTNode* minNode = current->right;
+            BSTNode* minNodeParent = current;
+
+            while (minNode->left) {
+                minNodeParent = minNode;
+                minNode = minNode->left;
+            }
+
+            node_to_remove->value = minNode->value;
+            node_to_remove = minNode;
+            parent = minNodeParent;
+            remove_from_left = (minNodeParent->left == minNode);
+        }
+
+        replacementNode = (node_to_remove->left) ? node_to_remove->left : node_to_remove->right;
+
+        if (parent == nullptr) {
+            root = replacementNode;
+        } else if (remove_from_left) {
+            parent->left = replacementNode;
+        } else {
+            parent->right = replacementNode;
+        }
+
+        delete node_to_remove;
+    }
+
     void remove(const int& value) {
         root = remove(root, value);
     }
